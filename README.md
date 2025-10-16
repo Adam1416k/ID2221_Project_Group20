@@ -1,44 +1,68 @@
-# ID2221_Project_Group20
+# GTFS Analytics with Docker Spark
 
+Process Swedish transit data using Docker-based Spark and HDFS.
 
+## Prerequisites
 
-# Project Setup
-## Installation
-- pip install -r requirements.txt
+- Docker Desktop (Windows/Mac) or Docker Engine (Linux)
 
-## Environment Variables
-Create a .env file (not committed to git) based on .env.example
+## Setup
 
-Open .env and add your Trafiklab API key:
-- TRAFIKLAB_API_KEY= ...
+1. **Clone repository**
+   ```bash
+   git clone https://github.com/Adam1416k/ID2221_Project_Group20.git
+   cd ID2221_Project_Group20
+   ```
 
+2. **Start Docker cluster**
+   ```bash
+   docker-compose up -d
+   ```
 
+3. **Verify services are running**
+   ```bash
+   docker ps
+   ```
+   Should show: spark-master, spark-worker, namenode, datanode1
 
+## Upload Data to HDFS
 
-# Running the Pipeline
-## Step 1 – Ingest Data
-Downloads and extracts GTFS Sverige 2 data, then uploads it to HDFS:
-- python -m src.ingest_gtfs
+**Option 1: Direct file copy (recommended)**
+- Place GTFS files in `./data/raw/2025-10/` folder
+- Files are automatically accessible in containers at `/data/`
 
-What happens:
-- Fetches monthly dataset from Trafiklab
-- Extracts ZIP to data/raw/<year-month>/
-- Uploads to HDFS under /data/gtfs_sverige/<year-month>/gtfs
+**Option 2: Upload to HDFS manually**
+```bash
+# Copy files into namenode container
+docker cp your-gtfs-file.txt namenode:/tmp/
 
-## Step 2 – Process Data
-Cleans and normalizes the raw CSVs into Parquet tables for analytics:
-- spark-submit src/process_gtfs.py
+# Upload to HDFS
+docker exec namenode hdfs dfs -put /tmp/your-gtfs-file.txt /data/
+```
 
-Outputs written to:
-- hdfs://namenode:8020/data/gtfs_sverige/<year-month>/curated/
+## Run Spark Analytics
 
+```bash
+docker exec spark-master /spark/bin/spark-submit \
+  --master spark://spark-master:7077 \
+  /app/docker_analytics.py
+```
+## Access Web Interfaces
 
+- **Spark Master**: http://localhost:8080
+- **HDFS Namenode**: http://localhost:9870
 
-# NEXT STEPS AFTER PROCESSING:
-- Run aggregations – compute busiest and least busy stops, average trip times, etc.
+## Troubleshooting
 
-- Create visualizations – use Matplotlib or a notebook to plot top 10/lowest 10 stops.
+**Containers not starting**:
+```bash
+docker-compose down
+docker-compose up -d
+```
 
-- Automate – add a Docker Compose setup or daily cron job to re-ingest new monthly data.
+**No analytics results**:
+- Check data exists in `./data/raw/2025-10/`
+- Verify containers are running: `docker ps`
+- Check logs: `docker-compose logs spark-master`
 
-- Extend – compare regions, detect anomalies, or integrate with streaming data (Kafka).
+**Permission errors**: Make sure Docker has access to project folder.
