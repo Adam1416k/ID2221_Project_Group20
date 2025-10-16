@@ -109,7 +109,9 @@ def main():
     if calendar is not None:
         write_parquet(calendar_c, curated, "calendar")
 
-    print("✅ Processing complete. Curated parquet tables written to:", curated)
+        
+    print(f"Results written to: {curated}")
+    print("Processing complete. Curated parquet tables written to:", curated)
 
 if __name__ == "__main__":
     main()

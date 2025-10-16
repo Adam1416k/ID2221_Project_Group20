@@ -48,7 +48,7 @@ def main():
     print(f"Copying to HDFS: {hdfs_target}")
     hdfs_put(extract_dir, hdfs_target)
 
-    print("✅ Ingestion complete.")
+    print("Ingestion complete.")
 
 if __name__ == "__main__":
     main()
