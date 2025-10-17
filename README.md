@@ -40,6 +40,19 @@ docker exec spark-master /spark/bin/spark-submit \
   --master spark://spark-master:7077 \
   /app/docker_analytics.py
 ```
+## Plot Results
+To plot results, you need to do so locally, outside of Docker.
+1. Create a venv and install dependencies from `requirements.txt:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+2. Run the plotting script (adjust the path to your results file as needed):
+```bash
+python3 src/plot_results.py ../data/analytics_results/gtfs_summary_2025-10-01.json
+```
+
 ## Access Web Interfaces
 
 - **Spark Master**: http://localhost:8080
