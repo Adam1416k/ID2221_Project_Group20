@@ -51,8 +51,14 @@ def save_results_locally(results_dict, output_dir="/data/analytics_results"):
         f.write("-" * 30 + "\n")
         f.write(f"- Total unique routes: {results_dict['route_stats']['total_routes']:,}\n")
         f.write(f"- Average trips per route: {results_dict['route_stats']['avg_trips_per_route']:.1f}\n")
+    
+    # Also store raw JSON to a separate file
+    json_out_path = os.path.join(output_dir, f"gtfs_summary_{timestamp}.json")
+    import json
+    with open(json_out_path, "w", encoding="utf-8") as jf:
+        json.dump(results_dict, jf, ensure_ascii=False, indent=4)
 
-    print(f"Results saved to: {out_path}")
+    print(f"Results saved to: {out_path} and {json_out_path}")
     return out_path
 
 def main():
@@ -101,10 +107,10 @@ def main():
             .join(stops, "stop_id", "left") \
             .select("stop_id", "stop_name", "frequency") \
             .orderBy(desc("frequency")) \
-            .limit(10)
+            .limit(50)
         
-    # Build top stops list
-        print("Top 10 Most Visited Stops:")
+        # Build top stops list
+        print("Top 50 Most Visited Stops:")
         for i, row in enumerate(top_stops.collect(), 1):
             stop_name = row.stop_name or "Unknown"
             output_line = f"{i:2d}. {str(stop_name)[:50]} ({row.frequency:,} visits)"
@@ -122,10 +128,10 @@ def main():
             .join(stops, "stop_id", "left") \
             .select("stop_id", "stop_name", "frequency") \
             .orderBy(asc("frequency")) \
-            .limit(10)
+            .limit(50)
         
     # Build least stops list
-        print("Top 10 Least Visited Stops:")
+        print("Top 50 Least Visited Stops:")
         for i, row in enumerate(least_stops.collect(), 1):
             stop_name = row.stop_name or "Unknown"
             output_line = f"{i:2d}. {str(stop_name)[:50]} ({row.frequency:,} visits)"
@@ -141,15 +147,18 @@ def main():
         route_trip_counts = trips.groupBy("route_id").agg(count("*").alias("trip_count"))
         total_routes = route_trip_counts.count()
         avg_trips = route_trip_counts.agg({"trip_count": "avg"}).collect()[0][0]
+        one_stop_routes = route_trip_counts.filter(route_trip_counts.trip_count == 1).count()
         
         results['route_stats'] = {
             'total_routes': total_routes,
-            'avg_trips_per_route': avg_trips
+            'avg_trips_per_route': avg_trips,
+            'one_stop_routes': one_stop_routes
         }
         
         print("Route Statistics:")
         print(f"- Total unique routes: {total_routes:,}")
         print(f"- Average trips per route: {avg_trips:.1f}")
+        print(f"- Routes with only one stop: {one_stop_routes:,}")
         
         # Save results locally
         print("\nSaving results locally...")
