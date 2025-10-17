@@ -27,17 +27,10 @@ Process Swedish transit data using Docker-based Spark and HDFS.
 
 ## Upload Data to HDFS
 
-**Option 1: Direct file copy (recommended)**
-- Place GTFS files in `./data/raw/2025-10/` folder
-- Files are automatically accessible in containers at `/data/`
+Configure the data period in `src/docker_analytics.py` (default is October 1, 2025). Data is fetched automatically.
 
-**Option 2: Upload to HDFS manually**
-```bash
-# Copy files into namenode container
-docker cp your-gtfs-file.txt namenode:/tmp/
-
-# Upload to HDFS
-docker exec namenode hdfs dfs -put /tmp/your-gtfs-file.txt /data/
+```python
+month, day = "10", "01"
 ```
 
 ## Run Spark Analytics

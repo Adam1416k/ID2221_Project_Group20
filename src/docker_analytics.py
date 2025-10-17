@@ -7,6 +7,7 @@ import os
 import sys
 from datetime import datetime
 from typing import Any, Dict, List
+from download_data import download_data
 
 
 def save_results_locally(results_dict, output_dir="/data/analytics_results"):
@@ -67,9 +68,11 @@ def main():
     
     print("Starting GTFS Analytics with Docker Spark")
     print("Python runtime:", sys.version)
-    
-    hdfs_path = "/data/raw/sweden-20251015"
-    
+
+    month, day = "10", "01"
+
+    hdfs_path = download_data(f"https://data.samtrafiken.se/trafiklab/gtfs-sverige-2/2025/{month}/sweden-2025{month}{day}.zip", f"../data/raw/sweden-2025-{month}/sweden-2025{month}{day}")
+
     try:
         # Load data
         print("Loading GTFS data...")
@@ -107,10 +110,10 @@ def main():
             .join(stops, "stop_id", "left") \
             .select("stop_id", "stop_name", "frequency") \
             .orderBy(desc("frequency")) \
-            .limit(50)
+            .limit(30)
         
         # Build top stops list
-        print("Top 50 Most Visited Stops:")
+        print("Top 30 Most Visited Stops:")
         for i, row in enumerate(top_stops.collect(), 1):
             stop_name = row.stop_name or "Unknown"
             output_line = f"{i:2d}. {str(stop_name)[:50]} ({row.frequency:,} visits)"
@@ -128,10 +131,10 @@ def main():
             .join(stops, "stop_id", "left") \
             .select("stop_id", "stop_name", "frequency") \
             .orderBy(asc("frequency")) \
-            .limit(50)
+            .limit(30)
         
     # Build least stops list
-        print("Top 50 Least Visited Stops:")
+        print("Top 30 Least Visited Stops:")
         for i, row in enumerate(least_stops.collect(), 1):
             stop_name = row.stop_name or "Unknown"
             output_line = f"{i:2d}. {str(stop_name)[:50]} ({row.frequency:,} visits)"
