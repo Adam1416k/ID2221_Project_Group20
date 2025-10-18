@@ -5,12 +5,12 @@ import json
 def plot_top_stops(top_stops: list[dict]):
     """Plot the top N most visited stops. Bar chart."""
     stop_names = [stop["stop_name"] for stop in top_stops]
-    frequencies = [stop["frequency"] for stop in top_stops]
+    avg_visits = [stop["avg_visits_per_day"] for stop in top_stops]
 
     plt.figure(figsize=(12, 6))
-    plt.barh(stop_names, frequencies, color="skyblue")
-    plt.xlabel("Number of Visits")
-    plt.title(f"Top {len(top_stops)} Most Visited Stops")
+    plt.barh(stop_names, avg_visits, color="skyblue")
+    plt.xlabel("Average Visits per Day")
+    plt.title(f"Top {len(top_stops)} Most Visited Stops (Average per day from 2025-10-01 to 2025-10-14)")
     plt.gca().invert_yaxis()  # Highest values on top
     plt.tight_layout()
     plt.show()
@@ -19,12 +19,12 @@ def plot_top_stops(top_stops: list[dict]):
 def plot_least_stops(least_stops: list[dict]):
     """Plot the top N least visited stops. Bar chart."""
     stop_names = [stop["stop_name"] for stop in least_stops]
-    frequencies = [stop["frequency"] for stop in least_stops]
+    avg_visits = [stop["avg_visits_per_day"] for stop in least_stops]
 
     plt.figure(figsize=(12, 6))
-    plt.barh(stop_names, frequencies, color="salmon")
-    plt.xlabel("Number of Visits")
-    plt.title(f"Top {len(least_stops)} Least Visited Stops")
+    plt.barh(stop_names, avg_visits, color="salmon")
+    plt.xlabel("Average Visits per Day")
+    plt.title(f"Top {len(least_stops)} Least Visited Stops (Average per day from 2025-10-01 to 2025-10-14)")
     plt.gca().invert_yaxis()  # Highest values on top
     plt.tight_layout()
     plt.show()

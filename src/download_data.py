@@ -47,6 +47,15 @@ def download_period(
     print("All data downloaded.")
     return True
 
+def cleanup_downloaded_data(output_dir: str) -> None:
+    """Remove downloaded GTFS data directory."""
+    if os.path.exists(output_dir):
+        import shutil
+        shutil.rmtree(output_dir)
+        print(f"Cleaned up downloaded data at: {output_dir}")
+    else:
+        print(f"No data found at: {output_dir} to clean up.")
+
 
 if __name__ == "__main__":
     # Example usage
