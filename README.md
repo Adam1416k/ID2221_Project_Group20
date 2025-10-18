@@ -27,10 +27,11 @@ Process Swedish transit data using Docker-based Spark and HDFS.
 
 ## Upload Data to HDFS
 
-Configure the data period in `src/docker_analytics.py` (default is October 1, 2025). Data is fetched automatically.
+Configure the data period in `src/docker_analytics.py` (ln 76-77) (default is October 1, 2025 to October 14, 2025). Data is fetched automatically.
 
 ```python
-month, day = "10", "01"
+month = "10"
+start_date, end_date = "2025-10-01", "2025-10-14"
 ```
 
 ## Run Spark Analytics
@@ -50,7 +51,7 @@ pip install -r requirements.txt
 ```
 2. Run the plotting script (adjust the path to your results file as needed):
 ```bash
-python3 src/plot_results.py ../data/analytics_results/gtfs_summary_2025-10-01.json
+python3 src/plot_results.py ../data/analytics_results/gtfs_summary_20251018_095500.json
 ```
 
 ## Access Web Interfaces
@@ -67,7 +68,7 @@ docker-compose up -d
 ```
 
 **No analytics results**:
-- Check data exists in `./data/raw/2025-10/`
+- Check data is downloaded correctly to `./data/raw/2025-<month>/` (should appear when running the docker_analytics.py script, and files should be cleaned up automatically afterwards).
 - Verify containers are running: `docker ps`
 - Check logs: `docker-compose logs spark-master`
 
